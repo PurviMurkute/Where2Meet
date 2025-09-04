@@ -16,22 +16,22 @@ const Header = () => {
     <div
       className={`flex items-center fixed top-0 py-2 shadow-sm bg-white z-10 ${
         isHomePage
-          ? "w-full justify-around"
+          ? "w-full justify-between px-2 md:px-0 md:justify-around"
           : "md:w-2/3 md:mx-62 justify-between my-1 px-4 md:px-9 rounded-full"
       }`}
     >
-      <h1 className="text-2xl font-bold flex justify-center items-center">
+      <h1 className="text-xl md:text-2xl font-bold flex justify-center items-center">
         <img
           src="/meeticon.png"
           alt="Where2Meet"
-          className="inline-block mr-2 w-[45px] cursor-pointer"
+          className="inline-block mr-2 w-[35px] md:w-[45px] cursor-pointer"
           onClick={() => navigate("/")}
         />{" "}
         Where2Meet
       </h1>
       <div className="flex justify-center items-center gap-8 font-bold text-gray-600">
         {isHomePage && (
-          <>
+          <div className="hidden md:flex md:gap-8">
             <ScrollLink
               to="home"
               smooth={true}
@@ -64,7 +64,7 @@ const Header = () => {
             >
               Support
             </ScrollLink>
-          </>
+          </div>
         )}
         {user ? (
           <Button

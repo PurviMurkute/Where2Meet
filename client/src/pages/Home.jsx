@@ -20,12 +20,12 @@ const Home = () => {
         name="home"
         className="w-full bg-gradient-to-l from-[#e6e6ff] to-[#ffffff]"
       >
-        <div className="max-w-7xl flex flex-col md:flex-row items-center justify-between min-h-screen mx-auto px-6">
-          <div className="max-w-2xl">
+        <div className="md:max-w-7xl flex flex-col md:flex-row items-center justify-between min-h-screen mx-auto px-10 md:px-6 pt-23 md:pt-0 md:mt-0">
+          <div className="md:ps-10 max-w-2xl">
             <p className="uppercase text-purple-600 font-semibold tracking-wide mb-2">
               Where2Meet
             </p>
-            <h1 className="text-5xl font-extrabold leading-tight mb-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
               Track, <br />
               Discover, <br />
               Go
@@ -48,15 +48,15 @@ const Home = () => {
               />
             )}
           </div>
-          <div className="mt-10 md:mt-0 flex justify-center w-full md:w-1/2">
+          <div className="mt-8 md:mt-0 flex justify-center w-[80%] md:w-1/2">
             <img src={HomeImg} alt="Home" className="max-w-md w-full" />
           </div>
         </div>
-        <div className="py-10">
+        <div className="pb-10">
           <img
             src={location}
             alt="location"
-            className="w-full h-[450px] object-cover opacity-70"
+            className="w-full h-[250px] md:h-[450px] object-cover opacity-70"
           />
           <h2
             name="features"
@@ -67,7 +67,7 @@ const Home = () => {
               Where2Meet
             </span>
           </h2>
-          <div className="max-w-7xl mx-auto flex justify-evenly items-center flex-wrap text-center py-10">
+          <div className="max-w-7xl mx-auto flex justify-evenly items-center flex-wrap text-center md:py-10">
             <FeatureCard
               title={"Real-time location sharing"}
               description={"See where your friends are instantly in Real-time."}
