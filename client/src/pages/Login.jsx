@@ -88,6 +88,7 @@ const Login = () => {
             variant="outline"
             btnIcon={"google"}
             iconPosition={"left"}
+            onClick={() => {window.open(`${import.meta.env.VITE_SERVER_URL}/auth/google`, "_self")}}
           />
           <p className="text-gray-600">Don't have an account? <a href="/register" className="text-blue-700">Register</a></p>
         </form>

@@ -14,6 +14,11 @@ const userSchema = new Schema(
     password: {
       type: String,
     },
+    googleId: {
+      type: String,
+      sparse: true,
+      unique: true,
+    },
     profile: { type: String },
     location: {
       latitude: { type: Number },

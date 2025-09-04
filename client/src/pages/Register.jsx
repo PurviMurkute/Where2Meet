@@ -89,7 +89,7 @@ const Register = () => {
             variant="outline"
             btnIcon={"google"}
             iconPosition={"left"}
-            onClick={registerUser}
+            onClick={() => {window.open(`${import.meta.env.VITE_SERVER_URL}/auth/google`, "_self")}}
           />
           <p className=" text-gray-600">Already have an account? <a href="/login" className="text-blue-700">Login</a></p>
         </form>
