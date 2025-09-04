@@ -1,18 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
 import Header from "../components/Header";
 import HomeImg from "../assets/homeimg.png";
 import Button from "../components/Button";
 import location from "../assets/location.jpg";
 import { useNavigate } from "react-router";
 import FeatureCard from "../components/FeatureCard";
+import { UserContext } from "../context/Context";
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const { user } = useContext(UserContext);
+
   return (
     <>
       <Header />
 
-      <div className="w-full bg-gradient-to-l from-[#e6e6ff] to-[#ffffff]">
+      <div
+        name="home"
+        className="w-full bg-gradient-to-l from-[#e6e6ff] to-[#ffffff]"
+      >
         <div className="max-w-7xl flex flex-col md:flex-row items-center justify-between min-h-screen mx-auto px-6">
           <div className="max-w-2xl">
             <p className="uppercase text-purple-600 font-semibold tracking-wide mb-2">
@@ -27,12 +34,19 @@ const Home = () => {
               Easily find the perfect meeting spot with your friends, share live
               locations, and coordinate in real-time, all in one place.
             </p>
-            <Button
-              btnText="Start Now"
-              btnSize="large"
-              variant="primary"
-              onClick={() => navigate("/register")}
-            />
+            {user ? (
+              <div className="flex gap-4">
+                <Button btnText="Create Group" btnSize={"large"} variant="primary" />
+                <Button btnText="Join Groups" btnSize={"large"} variant="outline" />
+              </div>
+            ) : (
+              <Button
+                btnText="Start Now"
+                btnSize="large"
+                variant="primary"
+                onClick={() => navigate("/register")}
+              />
+            )}
           </div>
           <div className="mt-10 md:mt-0 flex justify-center w-full md:w-1/2">
             <img src={HomeImg} alt="Home" className="max-w-md w-full" />
@@ -42,9 +56,12 @@ const Home = () => {
           <img
             src={location}
             alt="location"
-            className="w-full h-[500px] object-cover opacity-60"
+            className="w-full h-[450px] object-cover opacity-70"
           />
-          <h2 className="text-center text-2xl md:text-3xl font-bold text-black py-10">
+          <h2
+            name="features"
+            className="text-center text-2xl md:text-3xl font-bold text-black py-10"
+          >
             Features of{" "}
             <span className="text-purple-600 ml-2 font-extrabold">
               Where2Meet
