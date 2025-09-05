@@ -1,0 +1,75 @@
+import crypto from "crypto";
+import Group from "../models/Group.js";
+
+const createGroupCode = async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({ message: "Group name is required" });
+  }
+
+  try {
+    const code = crypto.randomBytes(3).toString("hex").toUpperCase();
+    const newGroup = new Group({
+      name,
+      code,
+      members: [{ userId: req.user._id }],
+    });
+    const savedGroup = await newGroup.save();
+
+    return res.status(201).json({
+      success: true,
+      data: savedGroup,
+      message: "Group created successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message,
+    });
+  }
+};
+
+const joinGroupByCode = async (req, res) => {
+  const { code } = req.body;
+  if (!code) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: "Group code is required",
+    });
+  }
+
+  try {
+    const group = await Group.findOne({ code });
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "Group not found",
+      });
+    }
+
+    if (
+      !group.members.some((member) => member.userId.toString() === req.user._id)
+    ) {
+      group.members.push({ userId: req.user._id });
+      await group.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: group,
+      message: "Joined group successfully",
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message,
+    });
+  }
+};
+
+export { createGroupCode, joinGroupByCode };

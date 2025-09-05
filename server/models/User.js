@@ -26,6 +26,7 @@ const userSchema = new Schema(
     },
     lastUpdated: { type: Date },
     isLocationSharing: { type: Boolean, default: false },
+    groups: [{ type: Schema.Types.ObjectId, ref: "Group" }],
   },
   { timestamps: true }
 );
