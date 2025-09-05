@@ -28,7 +28,6 @@ router.get(
       );
       res.redirect(`${process.env.CLIENT_URL}/google-success?token=${token}`);
     } catch (error) {
-      console.log("Google login error:", error);
       res.redirect(`${process.env.CLIENT_URL}/login`);
     }
   }

@@ -2,15 +2,16 @@ import crypto from "crypto";
 import Group from "../models/Group.js";
 
 const createGroupCode = async (req, res) => {
-  const { name } = req.body;
-  if (!name) {
+  const { groupName, description } = req.body;
+  if (!groupName) {
     return res.status(400).json({ message: "Group name is required" });
   }
 
   try {
     const code = crypto.randomBytes(3).toString("hex").toUpperCase();
     const newGroup = new Group({
-      name,
+      groupName,
+      description,
       code,
       members: [{ userId: req.user._id }],
     });

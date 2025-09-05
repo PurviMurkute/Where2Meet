@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { Loader } from "lucide-react";
 import { useContext } from "react";
-import { UserContext } from "../context/Context";
+import { UserContext } from "../context/UserContext";
 
 const GoogleSuccess = () => {
   const { user, setUser } = useContext(UserContext);
@@ -49,9 +49,9 @@ const GoogleSuccess = () => {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen space-y-4">
-      <Loader className="w-6 h-6 animate-spin" />
-      <p>Logging you in...</p>
+    <div className="min-h-screen flex flex-col justify-center items-center h-screen space-y-4 bg-gradient-to-l from-[#afaff0] to-[#ffffff]">
+      <Loader className="w-8 h-8 animate-spin" />
+      <p className="font-medium">Logging you in...</p>
       <Toaster />
     </div>
   );

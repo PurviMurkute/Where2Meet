@@ -5,13 +5,56 @@ import Button from "../components/Button";
 import location from "../assets/location.jpg";
 import { useNavigate } from "react-router";
 import FeatureCard from "../components/FeatureCard";
-import { UserContext } from "../context/Context";
+import { UserContext } from "../context/UserContext";
+import { io } from "socket.io-client";
+import Model from "../components/Model";
+import { useState } from "react";
+import Input from "../components/Input";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import { GroupContext } from "../context/GroupContext";
+
+const socket = io.connect(`${import.meta.env.VITE_SERVER_URL}`);
 
 const Home = () => {
+  const [ isModelOpen, setIsModelOpen ] = useState(false);
+  const [ groupName, setGroupName ] = useState("");
+  const [ description, setDescription ] = useState("");
+
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
 
+  const { group, setGroup } = useContext(GroupContext);
+
+  const JWT = localStorage.getItem("token");
+
+  const handleCreateGroup = async () => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/group/create`, {
+        groupName,
+        description,
+      },
+    {
+      headers: {
+        Authorization: `Bearer ${JWT}`,
+      }
+    });
+    if(response.data.success){
+      toast.success(response.data.message);
+      setGroup(response.data.data);
+      setGroupName("");
+      setDescription("");
+    }else{
+      toast.error(response.data.message);
+    }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message || "Failed to create group");
+    }
+  }
+
+  console.log(group);
+  
   return (
     <>
       <Header />
@@ -36,7 +79,7 @@ const Home = () => {
             </p>
             {user ? (
               <div className="flex gap-4">
-                <Button btnText="Create Group" btnSize={"large"} variant="primary" />
+                <Button btnText="Create Group" btnSize={"large"} variant="primary" onClick={() => setIsModelOpen(true)} />
                 <Button btnText="Join Groups" btnSize={"large"} variant="outline" />
               </div>
             ) : (
@@ -90,6 +133,20 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <Model isOpen={isModelOpen} onClose={() => {setIsModelOpen(false)}}>
+        <div className="flex flex-col items-center">
+          <p className="text-gray-600 text-center py-3">💭 Give your group a unique name so friends can recognize it.</p>
+          <Input type="text" placeholder="Group Name" value={groupName} onChange={(e) => {setGroupName(e.target.value)}}  />
+          <Input type="text" placeholder="Description (Optional)" value={description} onChange={(e) => {setDescription(e.target.value)}} />
+        </div>
+        <p className="text-center text-green-700 font-bold text-2xl py-3">{group?.code || ""}</p>
+        {group && <p className="text-center text-gray-600 py-2 text-sm">Share this code with your friends to join the group.</p>}
+        <div className="py-3 flex justify-end gap-3 px-5">
+          <Button btnText={"Next"} btnSize={"small"} variant="primary" onClick={handleCreateGroup} />
+          <Button btnText={"Cancel"} btnSize={"small"} variant="outline" onClick={() => {setIsModelOpen(false)}} />
+        </div>
+      </Model>
+      <Toaster />
     </>
   );
 };

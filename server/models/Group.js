@@ -2,9 +2,12 @@ import { Schema, model } from "mongoose";
 
 const groupSchema = new Schema(
   {
-    name: {
+    groupName: {
       type: String,
       required: true,
+    },
+    description: {
+        type: String
     },
     code: {
       type: String,

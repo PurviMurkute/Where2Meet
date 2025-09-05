@@ -5,7 +5,7 @@ import Input from "../components/Input";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router";
-import { UserContext } from "../context/Context";
+import { UserContext } from "../context/UserContext";
 
 const Login = () => {
   const [loginUser, setLoginUser] = useState({

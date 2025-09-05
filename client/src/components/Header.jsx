@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import Button from "./Button";
 import { useNavigate } from "react-router";
 import { Link as ScrollLink } from "react-scroll";
-import { UserContext } from "../context/Context";
+import { UserContext } from "../context/UserContext";
 import toast, { Toaster } from "react-hot-toast";
 
 const Header = () => {

@@ -39,7 +39,6 @@ passport.use(
     },
 
     async (accessToken, refreshToken, profile, cb) => {
-      console.log(profile);
 
       try {
         const email = profile.emails[0].value;
