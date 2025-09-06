@@ -17,9 +17,11 @@ import { GroupContext } from "../context/GroupContext";
 const socket = io.connect(`${import.meta.env.VITE_SERVER_URL}`);
 
 const Home = () => {
-  const [ isModelOpen, setIsModelOpen ] = useState(false);
-  const [ groupName, setGroupName ] = useState("");
-  const [ description, setDescription ] = useState("");
+  const [isModelOpen, setIsModelOpen] = useState(false);
+  const [isJoinGroupModalOpen, setIsJoinGroupModalOpen] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [description, setDescription] = useState("");
+  const [groupCode, setGroupCode] = useState("");
 
   const navigate = useNavigate();
 
@@ -31,30 +33,61 @@ const Home = () => {
 
   const handleCreateGroup = async () => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/group/create`, {
-        groupName,
-        description,
-      },
-    {
-      headers: {
-        Authorization: `Bearer ${JWT}`,
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/api/create`,
+        {
+          groupName,
+          description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${JWT}`,
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setGroup(response.data.data);
+        setGroupName("");
+        setDescription("");
+      } else {
+        toast.error(response.data.message);
       }
-    });
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to create group"
+      );
+    }
+  };
+
+  console.log(group);
+
+  const handleJoinGroup = async () => {
+    try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_SERVER_URL}/api/join`,
+      {
+        code: groupCode
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${JWT}`,
+        },
+      }
+    );
+
     if(response.data.success){
       toast.success(response.data.message);
-      setGroup(response.data.data);
-      setGroupName("");
-      setDescription("");
     }else{
       toast.error(response.data.message);
     }
-    } catch (error) {
-      toast.error(error?.response?.data?.message || error?.message || "Failed to create group");
+     } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
     }
-  }
+  };
 
-  console.log(group);
-  
   return (
     <>
       <Header />
@@ -79,8 +112,18 @@ const Home = () => {
             </p>
             {user ? (
               <div className="flex gap-4">
-                <Button btnText="Create Group" btnSize={"large"} variant="primary" onClick={() => setIsModelOpen(true)} />
-                <Button btnText="Join Groups" btnSize={"large"} variant="outline" />
+                <Button
+                  btnText="Create Group"
+                  btnSize={"large"}
+                  variant="primary"
+                  onClick={() => setIsModelOpen(true)}
+                />
+                <Button
+                  btnText="Join Groups"
+                  btnSize={"large"}
+                  variant="outline"
+                  onClick={() => setIsJoinGroupModalOpen(true)}
+                />
               </div>
             ) : (
               <Button
@@ -133,17 +176,86 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <Model isOpen={isModelOpen} onClose={() => {setIsModelOpen(false)}}>
+      <Model
+        isOpen={isModelOpen}
+        onClose={() => {
+          setIsModelOpen(false);
+        }}
+      >
         <div className="flex flex-col items-center">
-          <p className="text-gray-600 text-center py-3">💭 Give your group a unique name so friends can recognize it.</p>
-          <Input type="text" placeholder="Group Name" value={groupName} onChange={(e) => {setGroupName(e.target.value)}}  />
-          <Input type="text" placeholder="Description (Optional)" value={description} onChange={(e) => {setDescription(e.target.value)}} />
+          <p className="text-gray-600 text-center py-3">
+            💭 Give your group a unique name so friends can recognize it.
+          </p>
+          <Input
+            type="text"
+            placeholder="Group Name"
+            value={groupName}
+            onChange={(e) => {
+              setGroupName(e.target.value);
+            }}
+          />
+          <Input
+            type="text"
+            placeholder="Description (Optional)"
+            value={description}
+            onChange={(e) => {
+              setDescription(e.target.value);
+            }}
+          />
         </div>
-        <p className="text-center text-green-700 font-bold text-2xl py-3">{group?.code || ""}</p>
-        {group && <p className="text-center text-gray-600 py-2 text-sm">Share this code with your friends to join the group.</p>}
+        <p className="text-center text-green-700 font-bold text-2xl py-3">
+          {group?.code || ""}
+        </p>
+        {group && (
+          <p className="text-center text-gray-600 py-2 text-sm">
+            Share this code with your friends to join the group.
+          </p>
+        )}
         <div className="py-3 flex justify-end gap-3 px-5">
-          <Button btnText={"Next"} btnSize={"small"} variant="primary" onClick={handleCreateGroup} />
-          <Button btnText={"Cancel"} btnSize={"small"} variant="outline" onClick={() => {setIsModelOpen(false)}} />
+          <Button
+            btnText={"Next"}
+            btnSize={"small"}
+            variant="primary"
+            onClick={handleCreateGroup}
+          />
+          <Button
+            btnText={"Cancel"}
+            btnSize={"small"}
+            variant="outline"
+            onClick={() => {
+              setIsModelOpen(false);
+            }}
+          />
+        </div>
+      </Model>
+      <Model
+        isOpen={isJoinGroupModalOpen}
+        onClose={() => {
+          setIsJoinGroupModalOpen(false);
+        }}
+      >
+        <div>
+          <h2 className="text-center font-bold text-lg">Let's Get You In!</h2>
+          <p className="text-gray-600 text-center py-3">
+            Type in the secret group code and start finding the perfect spot
+            together.
+          </p>
+          <Input
+            type="text"
+            placeholder="Group Code"
+            value={groupCode}
+            onChange={(e) => {
+              setGroupCode(e.target.value);
+            }}
+          />
+        </div>
+        <div className="py-3 flex justify-end gap-3 px-5">
+          <Button
+            btnText={"Join"}
+            btnSize={"small"}
+            variant="primary"
+            onClick={handleJoinGroup}
+          />
         </div>
       </Model>
       <Toaster />

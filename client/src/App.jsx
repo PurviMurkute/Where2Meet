@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import GoogleSuccess from './components/GoogleSuccess';
+import Groups from './pages/Groups';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/register" element={<Register />} ></Route>
         <Route path='/login' element={<Login />}></Route>
         <Route path='/google-success' element={<GoogleSuccess />}></Route>
+        <Route path='/groups' element={<Groups />}></Route>
       </Routes>
     </div>
   )

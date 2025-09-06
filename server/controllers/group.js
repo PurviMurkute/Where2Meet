@@ -47,7 +47,7 @@ const joinGroupByCode = async (req, res) => {
       return res.status(404).json({
         success: false,
         data: null,
-        message: "Group not found",
+        message: "Invalid Group Code",
       });
     }
 
@@ -63,7 +63,6 @@ const joinGroupByCode = async (req, res) => {
       data: group,
       message: "Joined group successfully",
     });
-
   } catch (error) {
     return res.status(400).json({
       success: false,
@@ -73,4 +72,33 @@ const joinGroupByCode = async (req, res) => {
   }
 };
 
-export { createGroupCode, joinGroupByCode };
+const getGroupsByUser = async (req, res) => {
+  const userId = req.user._id;
+
+  try {
+    const groups = await Group.find({ "members.userId": userId })
+      .populate("members.userId", "username email")
+      .sort({ createdAt: -1 });
+
+    if (!groups) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "You have not joined or created any groups yet",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: groups,
+      message: "Groups fetched successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message,
+    });
+  }
+};
+
+export { createGroupCode, joinGroupByCode, getGroupsByUser };

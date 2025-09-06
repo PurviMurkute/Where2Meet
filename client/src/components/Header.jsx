@@ -67,22 +67,32 @@ const Header = () => {
           </div>
         )}
         {user ? (
-          <Button
-            btnText={"Logout"}
-            btnSize={"small"}
-            variant={"outline"}
-            btnIcon={"arrow"}
-            iconPosition={"right"}
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("currentUser");
-              toast.success("Logged out successfully");
-              setUser(null);
-              setTimeout(() => {
-                navigate("/");
-              }, 2000);
-            }}
-          />
+          <>
+            <Button
+              btnText={"Logout"}
+              btnSize={"small"}
+              variant={"outline"}
+              btnIcon={"arrow"}
+              iconPosition={"right"}
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("currentUser");
+                toast.success("Logged out successfully");
+                setUser(null);
+                setTimeout(() => {
+                  navigate("/");
+                }, 2000);
+              }}
+            />
+            <Button
+              btnText={"My Groups"}
+              btnSize={"small"}
+              variant={"primary"}
+              onClick={() => {
+                navigate("/groups");
+              }}
+            />
+          </>
         ) : (
           <Button
             btnText="Get Started"

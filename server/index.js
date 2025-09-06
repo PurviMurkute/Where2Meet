@@ -49,7 +49,7 @@ io.on("connection", (socket) => {
 });
 
 app.use("/auth", router);
-app.use("/group", groupRouter);
+app.use("/api", groupRouter);
 
 connDB();
 server.listen(PORT, () => {
