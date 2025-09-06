@@ -26,7 +26,6 @@ const Groups = () => {
 
       if (response.data.success) {
         setUserGroups(response.data.data);
-        console.log(response.data.data);
 
         toast.success(response.data.message);
       } else {

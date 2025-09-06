@@ -4,6 +4,7 @@ const UserContext = createContext();
 
 const ContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  
 
   useEffect(() => {
     const userFromLS = localStorage.getItem("currentUser");

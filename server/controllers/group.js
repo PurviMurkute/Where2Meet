@@ -56,6 +56,12 @@ const joinGroupByCode = async (req, res) => {
     ) {
       group.members.push({ userId: req.user._id });
       await group.save();
+    }else{
+      return res.status(400).json({
+        success: false,
+        data: null,
+        message: "You have already join this code",
+      });
     }
 
     return res.status(200).json({

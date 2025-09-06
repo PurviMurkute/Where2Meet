@@ -27,7 +27,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
-  const userId = user._id;
+  const userId = user?._id;
 
   const { group, setGroup } = useContext(GroupContext);
 
@@ -64,8 +64,6 @@ const Home = () => {
     }
   };
 
-  console.log(group);
-
   const handleJoinGroup = async () => {
     try {
     const response = await axios.post(
@@ -82,17 +80,16 @@ const Home = () => {
 
     if(response.data.success){
       toast.success(response.data.message);
+      socket.emit("joinGroup", { groupCode, userId })
     }else{
       toast.error(response.data.message);
     }
      } catch (error) {
       toast.error(error?.response?.data?.message || error?.message);
+      console.log(error);
+      
     }
   };
-
-  useEffect(()=>{
-    socket.emit("joinGroup", { groupCode, userId})
-  }, [groupCode, user])
 
   return (
     <>
