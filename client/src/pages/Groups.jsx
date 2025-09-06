@@ -62,7 +62,7 @@ const Groups = () => {
                       alt="bg-img"
                       className="w-full h-[120px] object-cover rounded-t-xl"
                     />
-                    <div className="absolute inset-0 bg-black/60 flex flex-col justify-end p-5 text-white rounded">
+                    <div className="absolute inset-0 bg-black/55 flex flex-col justify-end p-5 text-white rounded">
                       <h2 className="text-2xl font-bold">{group.groupName}</h2>
                       <p className="text-sm">{group.description}</p>
                     </div>

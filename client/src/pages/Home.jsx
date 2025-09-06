@@ -13,6 +13,7 @@ import Input from "../components/Input";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { GroupContext } from "../context/GroupContext";
+import { useEffect } from "react";
 
 const socket = io.connect(`${import.meta.env.VITE_SERVER_URL}`);
 
@@ -26,6 +27,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
+  const userId = user._id;
 
   const { group, setGroup } = useContext(GroupContext);
 
@@ -87,6 +89,10 @@ const Home = () => {
       toast.error(error?.response?.data?.message || error?.message);
     }
   };
+
+  useEffect(()=>{
+    socket.emit("joinGroup", { groupCode, userId})
+  }, [groupCode, user])
 
   return (
     <>

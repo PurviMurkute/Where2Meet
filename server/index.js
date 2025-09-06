@@ -41,10 +41,10 @@ app.get("/health", (req, res) => {
 io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
-  socket.on("joinGroup", ({ code, userId }) => {
-    socket.join(code);
-    console.log(`User ${userId} joined group ${code}`);
-    io.to(code).emit("userJoined", { userId });
+  socket.on("joinGroup", ({ groupCode, userId }) => {
+    socket.join(groupCode);
+    console.log(`User ${userId} joined group ${groupCode}`);
+    io.to(groupCode).emit("userJoined", { userId });
   });
 });
 
