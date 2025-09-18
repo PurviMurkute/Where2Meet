@@ -56,7 +56,7 @@ const joinGroupByCode = async (req, res) => {
     ) {
       group.members.push({ userId: req.user._id });
       await group.save();
-    }else{
+    } else {
       return res.status(400).json({
         success: false,
         data: null,
@@ -107,4 +107,32 @@ const getGroupsByUser = async (req, res) => {
   }
 };
 
-export { createGroupCode, joinGroupByCode, getGroupsByUser };
+const getGroupMembersLocation = async (req, res) => {
+  const { code } = req.params;
+  try {
+    const group = await Group.findOne({ code }).populate(
+      "members.userId",
+      "username location"
+    );
+    if (!group)
+      return res
+        .status(404)
+        .json({ success: false, message: "Group not found" });
+
+    const locations = group.members
+      .map((m) => ({
+        userId: m.userId._id,
+        username: m.userId.username,
+        location: m.userId.location,
+      }))
+      .filter((m) => m.location && m.location.latitude && m.location.longitude);
+      console.log(locations);
+      
+
+    res.json({ success: true, data: locations });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export { createGroupCode, joinGroupByCode, getGroupsByUser, getGroupMembersLocation };

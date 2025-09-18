@@ -88,6 +88,7 @@ const Header = () => {
               btnText={"My Groups"}
               btnSize={"small"}
               variant={"primary"}
+              btnIcon={"group"}
               onClick={() => {
                 navigate("/groups");
               }}

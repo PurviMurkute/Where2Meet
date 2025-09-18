@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import GoogleSuccess from './components/GoogleSuccess';
 import Groups from './pages/Groups';
+import LocationSharing from './pages/LocationSharing';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path='/login' element={<Login />}></Route>
         <Route path='/google-success' element={<GoogleSuccess />}></Route>
         <Route path='/groups' element={<Groups />}></Route>
+        <Route path='/location-sharing' element={<LocationSharing />}></Route>
       </Routes>
     </div>
   )

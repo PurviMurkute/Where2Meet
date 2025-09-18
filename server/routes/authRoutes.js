@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser, getCurrentUser, loginUser } from '../controllers/user.js';
+import { createUser, getCurrentUser, loginUser, updateLocation } from '../controllers/user.js';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import verifyJwt from '../middlewares/jwt.js';
@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post('/register', createUser);
 router.post('/login', loginUser);
+router.put('/update-location', verifyJwt, updateLocation);
 
 router.get(
   "/google",

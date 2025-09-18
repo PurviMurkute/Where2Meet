@@ -7,6 +7,8 @@ import passport from "./config/passport.js";
 import http from "http";
 import { Server } from "socket.io";
 import groupRouter from "./routes/groupRoutes.js";
+import Group from "./models/Group.js";
+import User from "./models/User.js";
 
 dotenv.config();
 
@@ -45,6 +47,28 @@ io.on("connection", (socket) => {
     socket.join(groupCode);
     console.log(`User ${userId} joined group ${groupCode}`);
     io.to(groupCode).emit("userJoined", { userId });
+  });
+
+  socket.on("shareLocation", async ({ groupCode, userId, location }) => {
+    await User.findByIdAndUpdate(userId, {
+      location,
+      lastUpdated: new Date(),
+      isLocationSharing: true,
+    });
+
+    const group = await Group.findOne({ code: groupCode }).populate(
+      "members.userId",
+      "username location"
+    );
+    const locations = group.members
+      .map((m) => ({
+        userId: m.userId._id,
+        username: m.userId.username,
+        location: m.userId.location,
+      }))
+      .filter((m) => m.location && m.location.latitude && m.location.longitude);
+
+    io.to(groupCode).emit("groupLocations", locations);
   });
 });
 

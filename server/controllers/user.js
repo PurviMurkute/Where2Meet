@@ -113,4 +113,29 @@ const getCurrentUser = (req, res) => {
   }
 };
 
-export { createUser, loginUser, getCurrentUser };
+const updateLocation = async (req, res) => {
+  const { latitude, longitude } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findByIdAndUpdate(userId, {
+      location: { latitude, longitude },
+      lastUpdated: new Date(),
+      isLocationSharing: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: user,
+      message: "Location updated"
+    })
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      data: null,
+      message: error?.message,
+    });
+  }
+};
+
+export { createUser, loginUser, getCurrentUser, updateLocation };

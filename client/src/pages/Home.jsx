@@ -50,6 +50,7 @@ const Home = () => {
       if (response.data.success) {
         toast.success(response.data.message);
         setGroup(response.data.data);
+        localStorage.setItem("group", JSON.stringify(response.data.data));
         setGroupName("");
         setDescription("");
       } else {
@@ -64,30 +65,35 @@ const Home = () => {
     }
   };
 
+  console.log(group);
+  
+
   const handleJoinGroup = async () => {
     try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_SERVER_URL}/api/join`,
-      {
-        code: groupCode
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${JWT}`,
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/api/join`,
+        {
+          code: groupCode,
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${JWT}`,
+          },
+        }
+      );
 
-    if(response.data.success){
-      toast.success(response.data.message);
-      socket.emit("joinGroup", { groupCode, userId })
-    }else{
-      toast.error(response.data.message);
-    }
-     } catch (error) {
+      if (response.data.success) {
+        toast.success(response.data.message);
+        socket.emit("joinGroup", { groupCode, userId });
+        setTimeout(() => {
+          navigate('/location-sharing')
+        }, 1000)
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
       toast.error(error?.response?.data?.message || error?.message);
       console.log(error);
-      
     }
   };
 
@@ -215,12 +221,23 @@ const Home = () => {
           </p>
         )}
         <div className="py-3 flex justify-end gap-3 px-5">
-          <Button
-            btnText={"Next"}
-            btnSize={"small"}
-            variant="primary"
-            onClick={handleCreateGroup}
-          />
+          {group && group.code ? (
+            <Button
+              btnText="Start"
+              btnSize="small"
+              variant="primary"
+              onClick={() => {
+                navigate("/location-sharing");
+              }}
+            />
+          ) : (
+            <Button
+              btnText={"Next"}
+              btnSize={"small"}
+              variant="primary"
+              onClick={handleCreateGroup}
+            />
+          )}
           <Button
             btnText={"Cancel"}
             btnSize={"small"}
@@ -257,7 +274,7 @@ const Home = () => {
             btnText={"Join"}
             btnSize={"small"}
             variant="primary"
-            onClick={handleJoinGroup}
+            onClick={ handleJoinGroup}
           />
         </div>
       </Model>
