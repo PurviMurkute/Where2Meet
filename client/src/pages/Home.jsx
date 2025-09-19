@@ -13,7 +13,6 @@ import Input from "../components/Input";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { GroupContext } from "../context/GroupContext";
-import { useEffect } from "react";
 
 const socket = io.connect(`${import.meta.env.VITE_SERVER_URL}`);
 
@@ -22,14 +21,14 @@ const Home = () => {
   const [isJoinGroupModalOpen, setIsJoinGroupModalOpen] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
-  const [groupCode, setGroupCode] = useState("");
+  const [ group, setGroup ] = useState({});
 
   const navigate = useNavigate();
 
   const { user } = useContext(UserContext);
   const userId = user?._id;
 
-  const { group, setGroup } = useContext(GroupContext);
+  const { groupCode, setGroupCode } = useContext(GroupContext);
 
   const JWT = localStorage.getItem("token");
 
@@ -50,7 +49,8 @@ const Home = () => {
       if (response.data.success) {
         toast.success(response.data.message);
         setGroup(response.data.data);
-        localStorage.setItem("group", JSON.stringify(response.data.data));
+        setGroupCode(response.data.data.code);
+        localStorage.setItem("groupCode", JSON.stringify(response.data.data.code));
         setGroupName("");
         setDescription("");
       } else {
@@ -64,10 +64,7 @@ const Home = () => {
       );
     }
   };
-
-  console.log(group);
   
-
   const handleJoinGroup = async () => {
     try {
       const response = await axios.post(
@@ -84,6 +81,10 @@ const Home = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
+        localStorage.removeItem("groupCode");
+        setGroup(response.data.data);
+        setGroupCode(response.data.data.code);
+        localStorage.setItem("groupCode", JSON.stringify(response.data.data.code));
         socket.emit("joinGroup", { groupCode, userId });
         setTimeout(() => {
           navigate('/location-sharing')
@@ -96,6 +97,9 @@ const Home = () => {
       console.log(error);
     }
   };
+
+  console.log(group);
+  
 
   return (
     <>
@@ -213,23 +217,31 @@ const Home = () => {
           />
         </div>
         <p className="text-center text-green-700 font-bold text-2xl py-3">
-          {group?.code || ""}
+          {groupCode || ""}
         </p>
-        {group && (
+        {groupCode && (
           <p className="text-center text-gray-600 py-2 text-sm">
             Share this code with your friends to join the group.
           </p>
         )}
         <div className="py-3 flex justify-end gap-3 px-5">
-          {group && group.code ? (
+          {groupCode ? (
+            <>
+            <Button 
+            btnText={"Create new group"}
+            btnSize={"small"}
+            variant={"primary"}
+            onClick={handleCreateGroup}
+            />
             <Button
-              btnText="Start"
+              btnText="Start location sharing"
               btnSize="small"
               variant="primary"
               onClick={() => {
                 navigate("/location-sharing");
               }}
             />
+            </>
           ) : (
             <Button
               btnText={"Next"}
@@ -238,14 +250,6 @@ const Home = () => {
               onClick={handleCreateGroup}
             />
           )}
-          <Button
-            btnText={"Cancel"}
-            btnSize={"small"}
-            variant="outline"
-            onClick={() => {
-              setIsModelOpen(false);
-            }}
-          />
         </div>
       </Model>
       <Model

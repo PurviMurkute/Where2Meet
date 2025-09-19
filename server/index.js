@@ -43,32 +43,72 @@ app.get("/health", (req, res) => {
 io.on("connection", (socket) => {
   console.log(`New client connected: ${socket.id}`);
 
-  socket.on("joinGroup", ({ groupCode, userId }) => {
+  socket.on("joinGroup", async ({ groupCode, userId }) => {
     socket.join(groupCode);
+    socket.groupCode = groupCode;
+    socket.userId = userId;
     console.log(`User ${userId} joined group ${groupCode}`);
+
+    // Emit to room that user joined
     io.to(groupCode).emit("userJoined", { userId });
+
+    // Immediately send current locations in the group to everyone in room
+    try {
+      const group = await Group.findOne({ code: groupCode }).populate(
+        "members.userId",
+        "username location"
+      );
+      const locations = (group?.members || [])
+        .map((m) => ({
+          userId: m.userId._id,
+          username: m.userId.username,
+          location: m.userId.location,
+        }))
+        .filter(
+          (x) => x.location && x.location.latitude && x.location.longitude
+        );
+
+      io.to(groupCode).emit("groupLocations", locations);
+    } catch (err) {
+      console.error("joinGroup error:", err);
+    }
   });
 
   socket.on("shareLocation", async ({ groupCode, userId, location }) => {
-    await User.findByIdAndUpdate(userId, {
-      location,
-      lastUpdated: new Date(),
-      isLocationSharing: true,
-    });
+    try {
+      // Persist user's location (throttle in production)
+      await User.findByIdAndUpdate(userId, {
+        location,
+        lastUpdated: new Date(),
+        isLocationSharing: true,
+      });
 
-    const group = await Group.findOne({ code: groupCode }).populate(
-      "members.userId",
-      "username location"
-    );
-    const locations = group.members
-      .map((m) => ({
-        userId: m.userId._id,
-        username: m.userId.username,
-        location: m.userId.location,
-      }))
-      .filter((m) => m.location && m.location.latitude && m.location.longitude);
+      // Fetch updated group and broadcast
+      const group = await Group.findOne({ code: groupCode }).populate(
+        "members.userId",
+        "username location"
+      );
+      const locations = (group?.members || [])
+        .map((m) => ({
+          userId: m.userId._id,
+          username: m.userId.username,
+          location: m.userId.location,
+        }))
+        .filter(
+          (x) => x.location && x.location.latitude && x.location.longitude
+        );
 
-    io.to(groupCode).emit("groupLocations", locations);
+      io.to(groupCode).emit("groupLocations", locations);
+    } catch (err) {
+      console.error("shareLocation error:", err);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+    if (socket.groupCode && socket.userId) {
+      io.to(socket.groupCode).emit("userLeft", { userId: socket.userId });
+    }
   });
 });
 

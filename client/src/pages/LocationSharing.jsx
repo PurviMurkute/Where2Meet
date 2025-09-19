@@ -1,32 +1,57 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
-import { io } from "socket.io-client";
 import axios from "axios";
 import { GroupContext } from "../context/GroupContext";
 import { UserContext } from "../context/UserContext";
-
-const socket = io.connect(`${import.meta.env.VITE_SERVER_URL}`);
+import { io } from "socket.io-client";
 
 const containerStyle = {
   width: "100%",
-  height: "600px",
+  height: "650px",
 };
 
 const LocationSharing = () => {
-  const { group } = useContext(GroupContext);
+  const { groupCode } = useContext(GroupContext);
   const { user } = useContext(UserContext);
   const [members, setMembers] = useState([]);
   const [myLocation, setMyLocation] = useState(null);
 
+  // UseRef to store socket so we don't reconnect on every render
+  const socketRef = useRef(null);
+
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!groupCode || !user) return;
+
+    // Connect socket only once when page loads
+    socketRef.current = io(import.meta.env.VITE_SERVER_URL);
+
+    // Join group room immediately after socket connects
+    socketRef.current.emit("joinGroup", { groupCode, userId: user._id });
+
+    // Listen for live location updates
+    socketRef.current.on("groupLocations", (locations) => {
+      setMembers(locations);
+    });
+
+    return () => {
+      // Cleanup: disconnect socket when leaving page
+      socketRef.current.disconnect();
+    };
+  }, [groupCode, user]);
+
+  // Get user's current location and send to backend + socket
+  useEffect(() => {
+    if (!navigator.geolocation || !groupCode || !user) return;
+
     navigator.geolocation.getCurrentPosition(async (position) => {
       const location = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       };
+
       setMyLocation(location);
 
+      // Save location in DB
       await axios.put(
         `${import.meta.env.VITE_SERVER_URL}/auth/update-location`,
         location,
@@ -37,27 +62,21 @@ const LocationSharing = () => {
         }
       );
 
-      socket.emit("shareLocation", {
-        groupCode: group.code,
-        userId: user?._id,
+      // Emit location to group via socket
+      socketRef.current.emit("shareLocation", {
+        groupCode,
+        userId: user._id,
         location,
       });
     });
-  }, [group, user]);
+  }, [groupCode, user]);
 
+  // Load initial group members from backend (in case someone shared location earlier)
   useEffect(() => {
-    if (!group || !user) return;
-
-    socket.on("groupLocations", (locations) => {
-      setMembers(locations);
-    });
-
     const fetchGroupLocations = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_SERVER_URL}/api/group-location/${
-            group?.code
-          }`,
+          `${import.meta.env.VITE_SERVER_URL}/api/group-location/${groupCode}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -66,15 +85,11 @@ const LocationSharing = () => {
         );
         setMembers(res.data.data);
       } catch (error) {
-        console.error("Error fetching group locations:", err);
+        console.error("Error fetching group locations:", error);
       }
     };
-    fetchGroupLocations();
-
-    return () => {
-      socket.off("groupLocations");
-    };
-  }, [group, user]);
+    if (groupCode) fetchGroupLocations();
+  }, [groupCode]);
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: `${import.meta.env.VITE_GOOGLE_MAPS_API}`,
@@ -99,7 +114,7 @@ const LocationSharing = () => {
                 lat: member.location.latitude,
                 lng: member.location.longitude,
               }}
-              label={member?.username}
+              label={member.username}
             />
           ))}
         </GoogleMap>

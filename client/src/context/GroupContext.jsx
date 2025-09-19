@@ -3,23 +3,22 @@ import { createContext, useState } from "react";
 const GroupContext = createContext();
 
 const GroupProvider = ({ children }) => {
-  const [group, setGroup] = useState(() => {
-    const stored = localStorage.getItem("group");
+  const [groupCode, setGroupCode] = useState(() => {
+    const stored = localStorage.getItem("groupCode");
     return stored ? JSON.parse(stored) : null;
   });
 
-  // Optionally, update localStorage whenever group changes
-  const updateGroup = (g) => {
-    setGroup(g);
-    if (g) {
-      localStorage.setItem("group", JSON.stringify(g));
+  const updateGroup = (code) => {
+    setGroupCode(code);
+    if (code) {
+      localStorage.setItem("groupCode", JSON.stringify(code));
     } else {
-      localStorage.removeItem("group");
+      localStorage.removeItem("groupCode");
     }
   };
 
   return (
-    <GroupContext.Provider value={{ group, setGroup: updateGroup }}>
+    <GroupContext.Provider value={{ groupCode, setGroupCode: updateGroup }}>
       {children}
     </GroupContext.Provider>
   );

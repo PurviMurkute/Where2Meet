@@ -15,7 +15,9 @@ const createGroupCode = async (req, res) => {
       code,
       members: [{ userId: req.user._id }],
     });
-    const savedGroup = await newGroup.save();
+    let savedGroup = await newGroup.save();
+
+    savedGroup = await savedGroup.populate("members.userId", "username email isLocationSharing");
 
     return res.status(201).json({
       success: true,
@@ -52,10 +54,11 @@ const joinGroupByCode = async (req, res) => {
     }
 
     if (
-      !group.members.some((member) => member.userId.toString() === req.user._id)
+      !group.members.some((member) => member.userId.toString() === req.user._id.toString())
     ) {
       group.members.push({ userId: req.user._id });
       await group.save();
+      await group.populate("members.userId", "username email isLocationSharing");
     } else {
       return res.status(400).json({
         success: false,
