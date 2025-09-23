@@ -10,10 +10,10 @@ const FeatureCard = ({ title, description, icon }) => {
         privacy: <MdPrivacyTip className="text-purple-600 w-10 h-10 mx-auto" />,
     }
   return (
-    <div className="w-[380px] hover:bg-purple-200 py-4 px-8 rounded-lg transition duration-200">
+    <div className="w-[380px] hover:bg-purple-300 py-4 px-8 rounded-lg transition duration-200">
         {icon && <div className="mb-4">{icons[icon]}</div>}
       <h4 className="font-bold text-[18px]">{title}</h4>
-      <p className="text-gray-600 text-[15px]">{description}</p>
+      <p className="text-[15px]">{description}</p>
     </div>
   )
 }

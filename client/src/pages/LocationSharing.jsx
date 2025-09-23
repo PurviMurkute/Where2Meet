@@ -34,7 +34,6 @@ const LocationSharing = () => {
     });
 
     return () => {
-      // Cleanup: disconnect socket when leaving page
       socketRef.current.disconnect();
     };
   }, [groupCode, user]);
