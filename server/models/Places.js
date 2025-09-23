@@ -18,10 +18,11 @@ const placesSchema = new Schema(
       type: String,
       required: true,
     },
-    groupId: {
-      type: Schema.Types.ObjectId,
-      ref: "Group",
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number },
     },
+    groupCode: { type: String },
   },
   {
     timestamps: true,

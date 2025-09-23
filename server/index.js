@@ -9,6 +9,7 @@ import { Server } from "socket.io";
 import groupRouter from "./routes/groupRoutes.js";
 import Group from "./models/Group.js";
 import User from "./models/User.js";
+import placesRoutes from "./routes/placesRoutes.js";
 
 dotenv.config();
 
@@ -76,14 +77,12 @@ io.on("connection", (socket) => {
 
   socket.on("shareLocation", async ({ groupCode, userId, location }) => {
     try {
-      // Persist user's location (throttle in production)
       await User.findByIdAndUpdate(userId, {
         location,
         lastUpdated: new Date(),
         isLocationSharing: true,
       });
 
-      // Fetch updated group and broadcast
       const group = await Group.findOne({ code: groupCode }).populate(
         "members.userId",
         "username location"
@@ -112,8 +111,9 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use("/auth", router);
+app.use("/api", router);
 app.use("/api", groupRouter);
+app.use('/api', placesRoutes);
 
 connDB();
 server.listen(PORT, () => {
