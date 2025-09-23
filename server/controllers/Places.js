@@ -50,7 +50,7 @@ const getPlaces = async (req, res) => {
           location: `${avgLat},${avgLng}`,
           radius: 3000,
           type: category,
-          key: process.env.GOOGLE_PLACES_API_KEY,
+          key: process.env.GOOGLE_MAPS_API_KEY,
         },
       }
     );
