@@ -20,7 +20,7 @@ const Login = () => {
   const Login = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/auth/login`,
+        `${import.meta.env.VITE_SERVER_URL}/api/login`,
         {
           email: loginUser.email,
           password: loginUser.password,
@@ -96,7 +96,7 @@ const Login = () => {
                 iconPosition={"left"}
                 onClick={() => {
                   window.open(
-                    `${import.meta.env.VITE_SERVER_URL}/auth/google`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/google`,
                     "_self"
                   );
                 }}

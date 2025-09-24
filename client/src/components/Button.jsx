@@ -10,6 +10,7 @@ const Button = ({
   btnIcon,
   iconPosition,
   onClick,
+  className
 }) => {
   const sizeClasses = {
     small: "px-2 md:px-5 py-2 text-sm",
@@ -20,7 +21,7 @@ const Button = ({
 
   const variantClasses = {
     primary: "bg-purple-600 rounded-lg text-white hover:bg-purple-700",
-    secondary: "bg-gray-600 rounded-lg text-white hover:bg-gray-700",
+    secondary: "bg-gray-500 rounded-lg text-white hover:bg-gray-700",
     outline:
       "border-1 border-purple-600 rounded-lg text-purple-700 hover:bg-purple-600 hover:text-white",
     light_outline:
@@ -37,7 +38,7 @@ const Button = ({
 
   return (
     <button
-      className={`${sizeClasses[btnSize]} ${variantClasses[variant]} flex justify-center items-center cursor-pointer font-medium shadow-lg transition`}
+      className={`${sizeClasses[btnSize]} ${variantClasses[variant]} ${className} flex flex-row justify-center items-center cursor-pointer font-medium shadow-lg transition`}
       onClick={onClick}
     >
       {btnIcon && iconPosition === "left" && (

@@ -17,7 +17,7 @@ const Register = () => {
   const registerUser = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/auth/register`,
+        `${import.meta.env.VITE_SERVER_URL}/api/register`,
         {
           username: user.username,
           email: user.email,
@@ -112,7 +112,7 @@ const Register = () => {
                 iconPosition={"left"}
                 onClick={() =>
                   window.open(
-                    `${import.meta.env.VITE_SERVER_URL}/auth/google`,
+                    `${import.meta.env.VITE_SERVER_URL}/api/google`,
                     "_self"
                   )
                 }

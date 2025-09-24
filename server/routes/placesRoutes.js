@@ -4,6 +4,6 @@ import getPlaces from '../controllers/Places.js';
 
 const placesRoutes = express.Router();
 
-placesRoutes.get('/places/:groupCode', verifyJwt, getPlaces);
+placesRoutes.post('/places/:groupCode', verifyJwt, getPlaces);
 
 export default placesRoutes;

@@ -115,7 +115,7 @@ const getGroupMembersLocation = async (req, res) => {
   try {
     const group = await Group.findOne({ code }).populate(
       "members.userId",
-      "username location"
+      "username email location"
     );
     if (!group)
       return res
@@ -126,6 +126,7 @@ const getGroupMembersLocation = async (req, res) => {
       .map((m) => ({
         userId: m.userId._id,
         username: m.userId.username,
+        email: m.userId.email,
         location: m.userId.location,
       }))
       .filter((m) => m.location && m.location.latitude && m.location.longitude);

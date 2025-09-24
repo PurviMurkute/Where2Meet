@@ -1,5 +1,5 @@
 import Group from "../models/Group.js";
-import Places from '../models/Places.js';
+import Places from "../models/Places.js";
 import axios from "axios";
 
 const getPlaces = async (req, res) => {
@@ -54,6 +54,8 @@ const getPlaces = async (req, res) => {
         },
       }
     );
+
+    console.log(response.data.results[0].geometry);
 
     const rawPlaces = response.data.results
       .filter(

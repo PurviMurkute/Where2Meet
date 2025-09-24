@@ -19,8 +19,8 @@ const placesSchema = new Schema(
       required: true,
     },
     location: {
-      latitude: { type: Number },
-      longitude: { type: Number },
+      lat:{ type: Number },
+      lng: { type: Number },
     },
     groupCode: { type: String },
   },

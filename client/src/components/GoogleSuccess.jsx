@@ -21,7 +21,7 @@ const GoogleSuccess = () => {
 
         try {
           const res = await axios.get(
-            `${import.meta.env.VITE_SERVER_URL}/auth/current-user`,
+            `${import.meta.env.VITE_SERVER_URL}/api/current-user`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
