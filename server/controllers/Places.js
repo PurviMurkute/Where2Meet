@@ -55,8 +55,6 @@ const getPlaces = async (req, res) => {
       }
     );
 
-    console.log(response.data.results[0].geometry);
-
     const rawPlaces = response.data.results
       .filter(
         (place) =>
@@ -77,7 +75,7 @@ const getPlaces = async (req, res) => {
         groupCode,
       }));
 
-    // Optional: Clean old places for the group before saving new ones
+    // Clean old places for the group before saving new ones
     await Places.deleteMany({ groupCode });
 
     // Save all places to MongoDB

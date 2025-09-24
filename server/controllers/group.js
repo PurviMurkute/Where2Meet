@@ -17,7 +17,10 @@ const createGroupCode = async (req, res) => {
     });
     let savedGroup = await newGroup.save();
 
-    savedGroup = await savedGroup.populate("members.userId", "username email isLocationSharing");
+    savedGroup = await savedGroup.populate(
+      "members.userId",
+      "username email isLocationSharing"
+    );
 
     return res.status(201).json({
       success: true,
@@ -54,11 +57,16 @@ const joinGroupByCode = async (req, res) => {
     }
 
     if (
-      !group.members.some((member) => member.userId.toString() === req.user._id.toString())
+      !group.members.some(
+        (member) => member.userId.toString() === req.user._id.toString()
+      )
     ) {
       group.members.push({ userId: req.user._id });
       await group.save();
-      await group.populate("members.userId", "username email isLocationSharing");
+      await group.populate(
+        "members.userId",
+        "username email isLocationSharing"
+      );
     } else {
       return res.status(400).json({
         success: false,
@@ -130,8 +138,7 @@ const getGroupMembersLocation = async (req, res) => {
         location: m.userId.location,
       }))
       .filter((m) => m.location && m.location.latitude && m.location.longitude);
-      console.log(locations);
-      
+    console.log(locations);
 
     res.json({ success: true, data: locations });
   } catch (error) {
@@ -139,4 +146,41 @@ const getGroupMembersLocation = async (req, res) => {
   }
 };
 
-export { createGroupCode, joinGroupByCode, getGroupsByUser, getGroupMembersLocation };
+const leaveGroup = async (req, res) => {
+  const userId = req.user?._id;
+  const { groupId } = req.params;
+
+  try {
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        data: null,
+        message: "Group not found",
+      });
+    }
+
+    const updatedGroup = await Group.findByIdAndUpdate(
+      groupId,
+      { $pull: { members: { userId } } },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: updatedGroup,
+      message: "Left group successfully",
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export {
+  createGroupCode,
+  joinGroupByCode,
+  getGroupsByUser,
+  getGroupMembersLocation,
+  leaveGroup
+};

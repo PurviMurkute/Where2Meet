@@ -4,7 +4,6 @@ import axios from "axios";
 import { GroupContext } from "../context/GroupContext";
 import { UserContext } from "../context/UserContext";
 import { io } from "socket.io-client";
-import Header from "../components/Header";
 import Button from "../components/Button";
 import MemberCard from "../components/MemberCard";
 import toast from "react-hot-toast";
@@ -23,6 +22,7 @@ const LocationSharing = () => {
   const [category, setCategory] = useState("Cafe");
   const [places, setPlaces] = useState([]);
   const [selectedMenu, setSelectedMenu] = useState("Location");
+  const [ isLocationSharing, setIsLocationSharing ] = useState(false);
 
   // UseRef to store socket so we don't reconnect on every render
   const socketRef = useRef(null);
@@ -47,36 +47,54 @@ const LocationSharing = () => {
   }, [groupCode, user]);
 
   // Get user's current location and send to backend + socket
-  useEffect(() => {
-    if (!navigator.geolocation || !groupCode || !user) return;
+ useEffect(() => {
+  if (!navigator.geolocation || !groupCode || !user) return;
 
-    navigator.geolocation.getCurrentPosition(async (position) => {
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
       const location = {
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       };
 
       setMyLocation(location);
+      setIsLocationSharing(true);
 
-      // Save location in DB
-      await axios.put(
-        `${import.meta.env.VITE_SERVER_URL}/api/update-location`,
-        location,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      try {
+        // Save location in DB
+        await axios.put(
+          `${import.meta.env.VITE_SERVER_URL}/api/update-location`,
+          location,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
-      // Emit location to group via socket
-      socketRef.current.emit("shareLocation", {
-        groupCode,
-        userId: user._id,
-        location,
-      });
-    });
-  }, [groupCode, user]);
+        // Emit location to group via socket
+        socketRef.current.emit("shareLocation", {
+          groupCode,
+          userId: user._id,
+          location,
+        });
+      } catch (err) {
+        console.error("❌ Error saving location:", err);
+      }
+    },
+    (error) => {
+      setIsLocationSharing(false);
+      if (error.code === error.PERMISSION_DENIED) {
+        toast.error(`Location permission denied by ${user?.name}`);
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        toast.error(`Location unavailable ${user?.name}`);
+      } else if (error.code === error.TIMEOUT) {
+        toast.error(`Location request timed out ${user?.name}`);
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
+  );
+}, [groupCode, user]);
 
   // Load initial group members from backend (in case someone shared location earlier)
   useEffect(() => {
@@ -175,7 +193,7 @@ const LocationSharing = () => {
         <div className="w-full min-h-screen bg-gradient-to-b from-[#e6e6ff] to-[#ffffff] px-20 py-10 overflow-y-scroll scrollbar-hide">
           <h3 className="font-bold pb-4 pt-2 text-gray-600">Group Members</h3>
           {members.map((member, i) => (
-            <MemberCard key={i} member={member} />
+            <MemberCard key={i} member={member} isLocationSharing={isLocationSharing} />
           ))}
         </div>
       ) : (
